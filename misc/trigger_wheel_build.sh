@@ -17,7 +17,9 @@ V=$(echo "$V" | cut -d" " -f2)
 git clone https://${WHEELS_PUSH_TOKEN}@github.com/mypyc/mypy_mypyc-wheels.git build
 cd build
 echo $COMMIT > mypy_commit
+git status || true
 git commit -am "Build wheels for mypy $V"
+git status
 git tag v$V
 # Push a tag, but no need to push the change to master
 git push --tags
