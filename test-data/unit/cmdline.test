@@ -1269,3 +1269,16 @@ x = 0  # type: str
 y = 0  # type: str
 [out]
 pkg.py:1: error: Incompatible types in assignment (expression has type "int", variable has type "str")
+
+[case testMypyVersionMismatch]
+# cmd: mypy main.py
+[file mypy.ini]
+\[mypy]
+python_version = 3.6
+mypy_version = 0.1
+[file main.py]
+def f():
+    ...
+[out]
+mypy.ini: [mypy]: mypy_version: Configured mypy version '0.1' doesn't match runtime version '0.820'
+== Return code: 0

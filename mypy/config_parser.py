@@ -11,6 +11,7 @@ from typing_extensions import Final
 
 from mypy import defaults
 from mypy.options import Options, PER_MODULE_OPTIONS
+from mypy.version import __version__
 
 
 def parse_version(v: str) -> Tuple[int, int]:
@@ -31,6 +32,21 @@ def parse_version(v: str) -> Tuple[int, int]:
     else:
         raise argparse.ArgumentTypeError(
             "Python major version '{}' out of range (must be 2 or 3)".format(major))
+    return major, minor
+
+
+def parse_mypy_version(v: str) -> Tuple[int, int]:
+    m = re.match(r'\A(\d)\.(\d+)', __version__)
+    major, minor = int(m.group(1)), int(m.group(2))
+    if v is not None and  0 != len(v):
+        m = re.match(r'\A(\d)\.(\d+)\Z', v)
+        if not m:
+            raise argparse.ArgumentTypeError(
+                "Invalid mypy version '{}' (expected format: 'x.y')".format(v))
+        if major != int(m.group(1)) or minor != int(m.group(2)):
+            raise ValueError(
+                "Configured mypy version '{}.{}' doesn't match runtime version '{}.{}'".format(
+                    int(m.group(1)), int(m.group(2)), major, minor))
     return major, minor
 
 
@@ -79,6 +95,7 @@ def check_follow_imports(choice: str) -> str:
 # types.
 config_types = {
     'python_version': parse_version,
+    'mypy_version': parse_mypy_version,
     'strict_optional_whitelist': lambda s: s.split(),
     'custom_typing_module': str,
     'custom_typeshed_dir': expand_path,
